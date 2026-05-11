@@ -1,0 +1,297 @@
+# Web d'animals interactiva amb lector de veu
+
+```html
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animals interactius</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f2f7ff;
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      color: #1e3a5f;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .card {
+      width: 300px;
+      height: 420px;
+      perspective: 1000px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      background: white;
+    }
+
+    .card-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-back h2 {
+      color: #1e3a5f;
+      margin-bottom: 10px;
+    }
+
+    .card-back p {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 10px;
+      background: #1e88e5;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #1565c0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Animals interactius</h1>
+
+  <div class="container">
+
+    <!-- Lleó -->
+    <div class="card" onclick="flipCard(this)">
+      <div class="card-inner">
+
+        <div class="card-front">
+          <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?q=80&w=1200&auto=format&fit=crop" alt="Lleó">
+        </div>
+
+        <div class="card-back">
+          <div>
+            <h2>Lleó</h2>
+            <p id="text-lleo">
+              El lleó és un dels felins més grans del món. Viu principalment a l'Àfrica i és conegut com el rei de la selva.
+            </p>
+          </div>
+
+          <div class="buttons">
+            <button onclick="playNormal(event, 'text-lleo')">▶️ Play</button>
+            <button onclick="pauseSpeech(event)">⏸️ Pause</button>
+            <button onclick="stopSpeech(event)">⏹️ Stop</button>
+            <button onclick="slowRead(event, 'text-lleo')">🐢 Lectura lenta</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Elefant -->
+    <div class="card" onclick="flipCard(this)">
+      <div class="card-inner">
+
+        <div class="card-front">
+          <img src="https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?q=80&w=1200&auto=format&fit=crop" alt="Elefant">
+        </div>
+
+        <div class="card-back">
+          <div>
+            <h2>Elefant</h2>
+            <p id="text-elefant">
+              L'elefant és el mamífer terrestre més gran del planeta. Té una trompa molt llarga i una memòria excel·lent.
+            </p>
+          </div>
+
+          <div class="buttons">
+            <button onclick="playNormal(event, 'text-elefant')">▶️ Play</button>
+            <button onclick="pauseSpeech(event)">⏸️ Pause</button>
+            <button onclick="stopSpeech(event)">⏹️ Stop</button>
+            <button onclick="slowRead(event, 'text-elefant')">🐢 Lectura lenta</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Panda -->
+    <div class="card" onclick="flipCard(this)">
+      <div class="card-inner">
+
+        <div class="card-front">
+          <img src="https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?q=80&w=1200&auto=format&fit=crop" alt="Panda">
+        </div>
+
+        <div class="card-back">
+          <div>
+            <h2>Panda</h2>
+            <p id="text-panda">
+              El panda gegant viu a la Xina i s'alimenta principalment de bambú. És un animal molt tranquil i estimat.
+            </p>
+          </div>
+
+          <div class="buttons">
+            <button onclick="playNormal(event, 'text-panda')">▶️ Play</button>
+            <button onclick="pauseSpeech(event)">⏸️ Pause</button>
+            <button onclick="stopSpeech(event)">⏹️ Stop</button>
+            <button onclick="slowRead(event, 'text-panda')">🐢 Lectura lenta</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+
+    // Girar targeta
+    function flipCard(card) {
+      card.classList.toggle('flipped');
+    }
+
+    // Variable global
+    let currentSpeech = null;
+    let slowReading = false;
+
+    // Lectura normal
+    function playNormal(event, textId) {
+      event.stopPropagation();
+
+      stopSpeech(event);
+
+      const text = document.getElementById(textId).innerText;
+
+      currentSpeech = new SpeechSynthesisUtterance(text);
+      currentSpeech.lang = 'ca-ES';
+      currentSpeech.rate = 1;
+
+      speechSynthesis.speak(currentSpeech);
+    }
+
+    // Pausa
+    function pauseSpeech(event) {
+      event.stopPropagation();
+      speechSynthesis.pause();
+    }
+
+    // Stop
+    function stopSpeech(event) {
+      event.stopPropagation();
+      slowReading = false;
+      speechSynthesis.cancel();
+    }
+
+    // Lectura lenta paraula a paraula
+    async function slowRead(event, textId) {
+      event.stopPropagation();
+
+      stopSpeech(event);
+
+      slowReading = true;
+
+      const text = document.getElementById(textId).innerText;
+      const words = text.split(' ');
+
+      for (let i = 0; i < words.length; i++) {
+
+        if (!slowReading) break;
+
+        let utterance = new SpeechSynthesisUtterance(words[i]);
+        utterance.lang = 'ca-ES';
+        utterance.rate = 0.7;
+
+        speechSynthesis.speak(utterance);
+
+        await wait(700);
+      }
+    }
+
+    // Espera
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+  </script>
+
+</body>
+</html>
+```
+
+## Com utilitzar-ho
+
+1. Crea un fitxer anomenat `index.html`
+2. Copia tot aquest codi
+3. Enganxa'l dins del fitxer
+4. Obre el fitxer amb el navegador
+
+## Funcionalitats incloses
+
+✅ Targetes interactives
+✅ Animació flip 3D
+✅ Informació dels animals
+✅ Lector de veu
+✅ Botó Play
+✅ Botó Pause
+✅ Botó Stop
+✅ Lectura lenta paraula a paraula
+✅ Disseny modern i responsive
