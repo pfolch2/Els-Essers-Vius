@@ -259,7 +259,16 @@
 
     // Variable global
     let currentSpeech = null;
+
     let slowReading = false;
+
+    let pausedSlowReading = false;
+
+    let currentWordIndex = 0;
+
+    let currentWords = [];
+
+    let currentElement = null;
 
     // Lectura normal
    // Lectura normal
@@ -285,52 +294,113 @@ function resumeSpeech(event) {
 
   event.stopPropagation();
 
-  speechSynthesis.resume();
-}
+  pausedSlowReading = false;
 
+  speechSynthesis.resume();
+
+  // Si no hi ha res parlant, continuar manualment
+  if (!speechSynthesis.speaking) {
+
+    readWordByWord();
+  }
+}
+    
     // Pausa
     function pauseSpeech(event) {
-      event.stopPropagation();
-      speechSynthesis.pause();
-    }
-
-    // Stop
-    function stopSpeech(event) {
-      event.stopPropagation();
-      slowReading = false;
-      speechSynthesis.cancel();
-    }
-
-    // Lectura lenta paraula a paraula
-   async function slowRead(event, textId) {
 
   event.stopPropagation();
 
-  stopSpeech(event);
+  pausedSlowReading = true;
+
+  speechSynthesis.pause();
+}
+
+    // Stop
+   function stopSpeech(event) {
+
+  event.stopPropagation();
+
+  slowReading = false;
+
+  pausedSlowReading = false;
+
+  speechSynthesis.cancel();
+
+  // Restaurar text normal
+  if (currentElement && currentWords.length > 0) {
+
+    currentElement.innerHTML = currentWords.join(' ');
+  }
+}
+    
+    // Lectura lenta paraula a paraula
+  async function slowRead(event, textId) {
+
+  event.stopPropagation();
+
+  speechSynthesis.cancel();
 
   slowReading = true;
+  pausedSlowReading = false;
 
-  const element = document.getElementById(textId);
+  currentElement = document.getElementById(textId);
 
-  const originalText = element.innerText;
+  const originalText = currentElement.innerText;
 
-  const words = originalText.split(' ');
+  currentWords = originalText.split(' ');
 
-  for (let i = 0; i < words.length; i++) {
+  currentWordIndex = 0;
 
-    if (!slowReading) break;
+  readWordByWord();
+}
+    function readWordByWord() {
 
-    // Reconstruir text amb paraula destacada
-    element.innerHTML = words.map((word, index) => {
+  if (!slowReading) return;
 
-      if (index === i) {
-        return `<span class="highlight">${word}</span>`;
-      }
+  if (currentWordIndex >= currentWords.length) {
 
-      return word;
+    currentElement.innerHTML = currentWords.join(' ');
 
-    }).join(' ');
+    return;
+  }
 
+  // Subratllar paraula actual
+  currentElement.innerHTML = currentWords.map((word, index) => {
+
+    if (index === currentWordIndex) {
+
+      return `<span class="highlight">${word}</span>`;
+    }
+
+    return word;
+
+  }).join(' ');
+
+  // Crear veu
+  const utterance = new SpeechSynthesisUtterance(
+    currentWords[currentWordIndex]
+  );
+
+  utterance.lang = 'ca-ES';
+
+  utterance.rate = 0.6;
+
+  currentSpeech = utterance;
+
+  // Quan acaba la paraula
+  utterance.onend = () => {
+
+    if (!pausedSlowReading) {
+
+      currentWordIndex++;
+
+      readWordByWord();
+    }
+  };
+
+  speechSynthesis.speak(utterance);
+}
+    
     // Veu
     let utterance = new SpeechSynthesisUtterance(words[i]);
 
