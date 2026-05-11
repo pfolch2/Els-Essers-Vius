@@ -108,6 +108,12 @@
     button:hover {
       background: #1565c0;
     }
+    
+    .highlight {
+  background-color: yellow;
+  text-decoration: underline;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
@@ -127,16 +133,31 @@
         <div class="card-back">
           <div>
             <h2>Lleó</h2>
-            <p id="text-lleo">
+            <p id="text-lleo" class="reading-text">
               El lleó és un dels felins més grans del món. Viu principalment a l'Àfrica i és conegut com el rei de la selva.
             </p>
           </div>
 
           <div class="buttons">
-            <button onclick="playNormal(event, 'text-lleo')">▶️ Play</button>
-            <button onclick="pauseSpeech(event)">⏸️ Pause</button>
-            <button onclick="stopSpeech(event)">⏹️ Stop</button>
-            <button onclick="slowRead(event, 'text-lleo')">🐢 Lectura lenta</button>
+<button onclick="startNormalReading(event, 'text-lleo')">
+  📖 Lectura normal
+</button>
+
+<button onclick="resumeSpeech(event)">
+  ▶️ Play
+</button>
+
+<button onclick="pauseSpeech(event)">
+  ⏸️ Pause
+</button>
+
+<button onclick="stopSpeech(event)">
+  ⏹️ Stop
+</button>
+
+<button onclick="slowRead(event, 'text-lleo')">
+  🐢 Lectura lenta
+</button>
           </div>
         </div>
 
@@ -154,16 +175,31 @@
         <div class="card-back">
           <div>
             <h2>Elefant</h2>
-            <p id="text-elefant">
+            <p id="text-elefant" class="reading-text">
               L'elefant és el mamífer terrestre més gran del planeta. Té una trompa molt llarga i una memòria excel·lent.
             </p>
           </div>
 
           <div class="buttons">
-            <button onclick="playNormal(event, 'text-elefant')">▶️ Play</button>
-            <button onclick="pauseSpeech(event)">⏸️ Pause</button>
-            <button onclick="stopSpeech(event)">⏹️ Stop</button>
-            <button onclick="slowRead(event, 'text-elefant')">🐢 Lectura lenta</button>
+<button onclick="startNormalReading(event, 'text-elefant')">
+  📖 Lectura normal
+</button>
+
+<button onclick="resumeSpeech(event)">
+  ▶️ Play
+</button>
+
+<button onclick="pauseSpeech(event)">
+  ⏸️ Pause
+</button>
+
+<button onclick="stopSpeech(event)">
+  ⏹️ Stop
+</button>
+
+<button onclick="slowRead(event, 'text-elefant')">
+  🐢 Lectura lenta
+</button>
           </div>
         </div>
 
@@ -181,16 +217,31 @@
         <div class="card-back">
           <div>
             <h2>Panda</h2>
-            <p id="text-panda">
+            <p id="text-panda" class="reading-text">
               El panda gegant viu a la Xina i s'alimenta principalment de bambú. És un animal molt tranquil i estimat.
             </p>
           </div>
 
           <div class="buttons">
-            <button onclick="playNormal(event, 'text-panda')">▶️ Play</button>
-            <button onclick="pauseSpeech(event)">⏸️ Pause</button>
-            <button onclick="stopSpeech(event)">⏹️ Stop</button>
-            <button onclick="slowRead(event, 'text-panda')">🐢 Lectura lenta</button>
+<button onclick="startNormalReading(event, 'text-panda')">
+  📖 Lectura normal
+</button>
+
+<button onclick="resumeSpeech(event)">
+  ▶️ Play
+</button>
+
+<button onclick="pauseSpeech(event)">
+  ⏸️ Pause
+</button>
+
+<button onclick="stopSpeech(event)">
+  ⏹️ Stop
+</button>
+
+<button onclick="slowRead(event, 'text-panda')">
+  🐢 Lectura lenta
+</button>
           </div>
         </div>
 
@@ -211,19 +262,31 @@
     let slowReading = false;
 
     // Lectura normal
-    function playNormal(event, textId) {
-      event.stopPropagation();
+   // Lectura normal
+function startNormalReading(event, textId) {
 
-      stopSpeech(event);
+  event.stopPropagation();
 
-      const text = document.getElementById(textId).innerText;
+  speechSynthesis.cancel();
 
-      currentSpeech = new SpeechSynthesisUtterance(text);
-      currentSpeech.lang = 'ca-ES';
-      currentSpeech.rate = 1;
+  const text = document.getElementById(textId).innerText;
 
-      speechSynthesis.speak(currentSpeech);
-    }
+  currentSpeech = new SpeechSynthesisUtterance(text);
+
+  currentSpeech.lang = 'ca-ES';
+  currentSpeech.rate = 1;
+
+  speechSynthesis.speak(currentSpeech);
+}
+
+
+// Reprendre lectura pausada
+function resumeSpeech(event) {
+
+  event.stopPropagation();
+
+  speechSynthesis.resume();
+}
 
     // Pausa
     function pauseSpeech(event) {
@@ -239,29 +302,50 @@
     }
 
     // Lectura lenta paraula a paraula
-    async function slowRead(event, textId) {
-      event.stopPropagation();
+   async function slowRead(event, textId) {
 
-      stopSpeech(event);
+  event.stopPropagation();
 
-      slowReading = true;
+  stopSpeech(event);
 
-      const text = document.getElementById(textId).innerText;
-      const words = text.split(' ');
+  slowReading = true;
 
-      for (let i = 0; i < words.length; i++) {
+  const element = document.getElementById(textId);
 
-        if (!slowReading) break;
+  const originalText = element.innerText;
 
-        let utterance = new SpeechSynthesisUtterance(words[i]);
-        utterance.lang = 'ca-ES';
-        utterance.rate = 0.7;
+  const words = originalText.split(' ');
 
-        speechSynthesis.speak(utterance);
+  for (let i = 0; i < words.length; i++) {
 
-        await wait(700);
+    if (!slowReading) break;
+
+    // Reconstruir text amb paraula destacada
+    element.innerHTML = words.map((word, index) => {
+
+      if (index === i) {
+        return `<span class="highlight">${word}</span>`;
       }
-    }
+
+      return word;
+
+    }).join(' ');
+
+    // Veu
+    let utterance = new SpeechSynthesisUtterance(words[i]);
+
+    utterance.lang = 'ca-ES';
+
+    utterance.rate = 0.7;
+
+    speechSynthesis.speak(utterance);
+
+    await wait(700);
+  }
+
+  // Restaurar text normal
+  element.innerHTML = originalText;
+}
 
     // Espera
     function wait(ms) {
