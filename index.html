@@ -123,7 +123,7 @@
   <div class="container">
 
     <!-- Lleó -->
-    <div class="card" onclick="flipCard(this)">
+    <div class="card">
       <div class="card-inner">
 
         <div class="card-front">
@@ -165,7 +165,7 @@
     </div>
 
     <!-- Elefant -->
-    <div class="card" onclick="flipCard(this)">
+    <div class="card">
       <div class="card-inner">
 
         <div class="card-front">
@@ -207,7 +207,7 @@
     </div>
 
     <!-- Panda -->
-    <div class="card" onclick="flipCard(this)">
+    <div class="card">
       <div class="card-inner">
 
         <div class="card-front">
@@ -401,27 +401,24 @@ function resumeSpeech(event) {
   speechSynthesis.speak(utterance);
 }
     
-    // Veu
-    let utterance = new SpeechSynthesisUtterance(words[i]);
-
-    utterance.lang = 'ca-ES';
-
-    utterance.rate = 0.7;
-
-    speechSynthesis.speak(utterance);
-
-    await wait(700);
-  }
-
-  // Restaurar text normal
-  element.innerHTML = originalText;
-}
-
     // Espera
     function wait(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+document.querySelectorAll('.card').forEach(card => {
+
+  card.addEventListener('click', (e) => {
+
+    // Evitar girar si es prem un botó
+    if (e.target.tagName.toLowerCase() === 'button') {
+      return;
+    }
+
+    card.classList.toggle('flipped');
+  });
+});
+    
   </script>
 
 </body>
